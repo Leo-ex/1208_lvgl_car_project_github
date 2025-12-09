@@ -3,14 +3,85 @@
 // LVGL version: 8.3.11
 // Project name: SquareLine_Project
 #include <stdio.h>
+#include "lvgl.h"
 #include "ui.h"
+#define USER_MAX_COUNT 10
+#define USER_MAX_LEN 16
+typedef struct
+{
+    char username[USER_MAX_LEN];
+    char password[USER_MAX_LEN];
+} User_t;
 
+static User_t users[USER_MAX_COUNT];
+static int user_count = 0;
+
+static int find_user(const char * username)
+{
+    for(int i = 0; i < user_count; i++) {
+        if(strcmp(users[i].username, username) == 0) return i;
+    }
+    return -1;
+}
+
+static int user_register(const char * username, const char * password)
+{
+    if(user_count >= USER_MAX_COUNT) return -2;
+    if(find_user(username) >= 0) return -1;
+    strncpy(users[user_count].username, username, USER_MAX_LEN - 1);
+    strncpy(users[user_count].password, password, USER_MAX_LEN - 1);
+    user_count++;
+    return 0;
+}
+
+static int user_login(const char * username, const char * password)
+{
+    int idx = find_user(username);
+    if(idx < 0) return -1;
+    if(strcmp(users[idx].password, password) == 0) return 0;
+    return -2;
+}
+void msgbox_close_event(lv_event_t * e)
+{
+    lv_obj_t * box = lv_event_get_target(e);
+    lv_obj_del(box);
+}
+void show_msg(const char * txt)
+{
+    lv_obj_t * box = lv_msgbox_create(NULL, "提示", txt, NULL, false);
+    lv_obj_center(box);
+    lv_msgbox_add_btns(box, (const char *[]){"确定", ""});
+    lv_obj_add_event_cb(box, msgbox_close_event, LV_EVENT_VALUE_CHANGED, NULL);
+}
 void denglvhanshu01(lv_event_t * e)
 {
     // Your code here
+    lv_obj_t * ta_user = ui_zhanghaoText;
+    lv_obj_t * ta_pass = ui_mimaText;
+    const char * uname = lv_textarea_get_text(ta_user);
+    const char * upass = lv_textarea_get_text(ta_pass);
+
+    if(user_login(uname, upass) == 0) {
+        lv_scr_load_anim(ui_Screen1, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, false); // 登录成功切换主界面
+    } else {
+        show_msg("用户名或密码错误！");
+    }
 }
 
 void zhucehanshu01(lv_event_t * e)
 {
     // Your code here
+    lv_obj_t * ta_user = ui_zhanghaoText;
+    lv_obj_t * ta_pass = ui_mimaText;
+    const char * uname = lv_textarea_get_text(ta_user);
+    const char * upass = lv_textarea_get_text(ta_pass);
+
+    int ret = user_register(uname, upass);
+    if(ret == 0) {
+        show_msg("注册成功，请登录！");
+    } else if(ret == -1) {
+        show_msg("用户名已存在！");
+    } else if(ret == -2) {
+        show_msg("用户数量已满！");
+    }
 }

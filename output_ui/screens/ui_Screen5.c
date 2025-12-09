@@ -108,6 +108,7 @@ void ui_Screen5_screen_init(void)
 
 
     ui_denglvButton = lv_btn_create(ui_Panel3);
+    lv_obj_add_event_cb(ui_denglvButton, denglvhanshu01, LV_EVENT_CLICKED, NULL);
     lv_obj_set_width(ui_denglvButton, 100);
     lv_obj_set_height(ui_denglvButton, 50);
     lv_obj_set_x(ui_denglvButton, -130);
@@ -128,6 +129,7 @@ void ui_Screen5_screen_init(void)
     lv_obj_set_style_text_font(ui_denglv, &ui_font_denglvjiemian, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_zhuceButton = lv_btn_create(ui_Panel3);
+    lv_obj_add_event_cb(ui_zhuceButton, zhucehanshu01, LV_EVENT_CLICKED, NULL);
     lv_obj_set_width(ui_zhuceButton, 100);
     lv_obj_set_height(ui_zhuceButton, 50);
     lv_obj_set_x(ui_zhuceButton, 130);
